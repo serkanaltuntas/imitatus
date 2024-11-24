@@ -1,9 +1,9 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-import uuid
-from urllib.parse import parse_qs, urlparse
+import sys
 import time
-from http import HTTPStatus
+import uuid
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse
 
 
 class MockHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -26,14 +26,23 @@ class MockHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _get_json_body(self):
+        """Get and parse JSON request body with error handling"""
         try:
             content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 1024 * 1024 * 5:  # 5MB limit
+                self._send_response({"error": "Request entity too large"}, 413)
+                return None
             if content_length > 0:
-                body = self.rfile.read(content_length)
-                return json.loads(body)
+                try:
+                    body = self.rfile.read(content_length)
+                    return json.loads(body)
+                except json.JSONDecodeError:
+                    self._send_response({"error": "Invalid JSON format"}, 400)
+                    return None
             return {}
-        except json.JSONDecodeError:
-            return {}
+        except Exception as e:
+            self._send_response({"error": str(e)}, 500)
+            return None
 
     def _send_response(self, data, status_code=200, extra_headers=None):
         self._set_headers(status_code, extra_headers)
@@ -62,45 +71,90 @@ class MockHTTPRequestHandler(BaseHTTPRequestHandler):
         self.request_logs.append(request_data)
 
     def do_POST(self):
-        self._log_request()
-        parsed_path = urlparse(self.path)
+        """Handle POST requests with comprehensive error handling"""
+        try:
+            self._log_request()
+            parsed_path = urlparse(self.path)
 
-        if parsed_path.path == '/api/login':
-            body = self._get_json_body()
-            if body.get('username') == 'admin' and body.get('password') == 'password':
-                token = str(uuid.uuid4())
-                user_id = str(uuid.uuid4())
-                self.active_tokens[token] = {
-                    'user_id': user_id,
-                    'created_at': time.time()
+            if parsed_path.path == '/api/login':
+                body = self._get_json_body()
+                if body is None:  # Error already handled in _get_json_body
+                    return
+
+                # Validate login request body
+                if not all(key in body for key in ['username', 'password']):
+                    self._send_response({
+                        "error": "Missing required fields: username and password"
+                    }, 400)
+                    return
+
+                # Check credentials
+                if body.get('username') == 'admin' and body.get('password') == 'password':
+                    token = str(uuid.uuid4())
+                    user_id = str(uuid.uuid4())
+                    self.active_tokens[token] = {
+                        'user_id': user_id,
+                        'created_at': time.time()
+                    }
+                    self._send_response({
+                        "token": token,
+                        "user_id": user_id,
+                        "message": "Login successful"
+                    })
+                else:
+                    self._send_response({
+                        "error": "Invalid credentials"
+                    }, 401)
+
+            elif parsed_path.path == '/api/items':
+                # Verify authentication first
+                if not self._verify_token():
+                    return
+
+                # Get and validate request body
+                body = self._get_json_body()
+                if body is None:  # Error already handled in _get_json_body
+                    return
+
+                # Validate item data
+                if not isinstance(body, dict):
+                    self._send_response({
+                        "error": "Invalid item format - expected object"
+                    }, 400)
+                    return
+
+                # Generate new item
+                item_id = str(uuid.uuid4())
+                item = {
+                    'id': item_id,
+                    'created_at': time.time(),
+                    **body
                 }
+
+                # Store item
+                self.items_db[item_id] = item
+
+                # Send success response
                 self._send_response({
-                    "token": token,
-                    "user_id": user_id,
-                    "message": "Login successful"
+                    "id": item_id,
+                    "item": item,
+                    "message": "Item created successfully"
                 })
+
             else:
-                self._send_response({"error": "Invalid credentials"}, 401)
+                self._send_response({
+                    "error": "Endpoint not found"
+                }, 404)
 
-        elif parsed_path.path == '/api/items':
-            if not self._verify_token():
-                return
-            body = self._get_json_body()
-            item_id = str(uuid.uuid4())
-            item = {
-                'id': item_id,
-                'created_at': time.time(),
-                **body
-            }
-            self.items_db[item_id] = item
+        except Exception as e:
+            # Log the error (in a real server, you'd use proper logging)
+            print(f"Server error in do_POST: {str(e)}", file=sys.stderr)
+
+            # Send error response
             self._send_response({
-                "id": item_id,
-                "item": item,
-                "message": "Item created successfully"
-            })
-
-        else:
-            self._send_response({"error": "Endpoint not found"}, 404)
+                "error": "Internal server error",
+                "detail": str(e) if self.server.debug else "Contact administrator"
+            }, 500)
 
     def do_GET(self):
         self._log_request()

@@ -8,7 +8,7 @@ VENV_PROD = $(VENV_DIR)/prod
 # Virtual environment binaries
 VENV_BIN = bin
 ifeq ($(OS),Windows_NT)
-	VENV_BIN = Scripts
+    VENV_BIN = Scripts
 endif
 
 # Commands with virtual environment paths
@@ -79,7 +79,7 @@ develop: venv-dev
 
 # Testing commands
 test: venv-test
-	$(TEST_PYTHON) -m pytest tests/ -v --cov=src
+	$(TEST_PYTHON) -m pytest tests/ -v --cov=src/imitatus
 
 test-unit: venv-test
 	$(TEST_PYTHON) -m pytest tests/unit -v --cov=src/imitatus
@@ -88,17 +88,17 @@ test-api: venv-test
 	$(TEST_PYTHON) -m pytest tests/api -v --cov=src/imitatus
 
 test-coverage: venv-test
-	$(TEST_PYTHON) -m pytest tests/ -v --cov=src --cov-report=html --cov-report=term
+	$(TEST_PYTHON) -m pytest tests/ -v --cov=src/imitatus --cov-report=html --cov-report=term
 
 # Development commands
 lint: venv-dev
-	$(DEV_PYTHON) -m flake8 src tests
-	$(DEV_PYTHON) -m black --check src tests
-	$(DEV_PYTHON) -m isort --check-only src tests
+	$(DEV_PYTHON) -m flake8 src/imitatus tests
+	$(DEV_PYTHON) -m black --check src/imitatus tests
+	$(DEV_PYTHON) -m isort --check-only src/imitatus tests
 
 format: venv-dev
-	$(DEV_PYTHON) -m black src tests
-	$(DEV_PYTHON) -m isort src tests
+	$(DEV_PYTHON) -m black src/imitatus tests
+	$(DEV_PYTHON) -m isort src/imitatus tests
 
 # Build and publish
 build: clean venv-dev
@@ -112,16 +112,17 @@ publish: build
 
 # Run servers
 run-dev: venv-dev
-	$(DEV_PYTHON) -m src.server --debug
+	$(DEV_PYTHON) -m imitatus.server --debug
 
 run-prod: venv-prod
-	$(PROD_PYTHON) -m src.server
+	$(PROD_PYTHON) -m imitatus.server
 
 # Cleaning
 clean:
 	rm -rf build/
 	rm -rf dist/
 	rm -rf *.egg-info
+	rm -rf src/*.egg-info
 	rm -rf .pytest_cache
 	rm -rf .coverage
 	rm -rf htmlcov/

@@ -87,7 +87,8 @@ class TestImitatus:
         data = response.json()
         assert 'id' in data
         assert data['item']['name'] == self.test_item['name']
-        return data['id']
+        self.item_id = data['id']  # Store it as instance variable
+        return self.item_id  # Return for tests that need it immediately
 
     def test_get_items(self):
         """Test getting all items"""
@@ -269,3 +270,63 @@ class TestImitatus:
         data = response.json()
         assert 'metadata' in data['item']
         assert data['item']['metadata']['tags'] == complex_item['metadata']['tags']
+
+    # In tests/test_server.py
+
+    def test_malformed_json(self):
+        """Test handling of malformed JSON in request body"""
+        response = requests.post(
+            f'{self.base_url}/api/items',
+            headers={
+                **self.auth_headers,
+                'Content-Type': 'application/json'
+            },
+            data='{"invalid": json',  # Malformed JSON
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert 'error' in data
+        assert 'Invalid JSON' in data['error']
+
+    def test_server_error_handling(self):
+        """Test server error handling"""
+        # Test with a large payload
+        large_payload = {'data': 'x' * (5 * 1024 * 1024 + 1)}  # Just over 5MB
+        response = requests.post(
+            f'{self.base_url}/api/items',
+            headers=self.auth_headers,
+            json=large_payload
+        )
+        assert response.status_code == 413
+        assert 'error' in response.json()
+        assert 'too large' in response.json()['error'].lower()
+
+    def test_concurrent_requests(self):
+        """Test handling of concurrent requests"""
+        import concurrent.futures
+
+        def make_request():
+            return requests.get(
+                f'{self.base_url}/api/items',
+                headers=self.auth_headers
+            )
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(make_request) for _ in range(10)]
+            responses = [f.result() for f in futures]
+
+        assert all(r.status_code == 200 for r in responses)
+
+    def test_request_logging(self):
+        """Test that requests are being logged properly"""
+        # Make a request
+        requests.get(f'{self.base_url}/debug/vars', headers=self.auth_headers)
+
+        # Check the logs
+        response = requests.get(f'{self.base_url}/debug/vars', headers=self.auth_headers)
+        data = response.json()
+
+        assert 'recent_requests' in data
+        assert len(data['recent_requests']) > 0
+        assert 'timestamp' in data['recent_requests'][-1]
+        assert 'method' in data['recent_requests'][-1]
