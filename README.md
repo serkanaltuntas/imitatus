@@ -24,14 +24,14 @@ cd imitatus
 pip install -r requirements.txt
 
 # Run
-python -m src.server --port 8000
+python -m imitatus.server --port 8000
 ```
 
 ## Basic Usage
 
 1. Start the server:
 ```bash
-python -m src.server
+python -m imitatus.server
 ```
 
 2. Authenticate:
