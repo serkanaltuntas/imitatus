@@ -1,0 +1,146 @@
+### Variables
+@baseUrl = {{baseUrl}}
+@host = localhost:8000
+
+### Login Request
+POST {{baseUrl}}/api/login HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Host: {{host}}
+Connection: keep-alive
+
+{
+    "username": "admin",
+    "password": "password"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+    client.global.set("userId", response.body.user_id);
+%}
+
+### Create Item
+POST {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+{
+    "name": "Test Item",
+    "description": "Created via POST",
+    "price": 29.99
+}
+
+> {%
+    client.global.set("itemId", response.body.id);
+%}
+
+### Get All Items
+GET {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+### Get Specific Item
+GET {{baseUrl}}/api/items/{{itemId}} HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+### Update Item
+PUT {{baseUrl}}/api/items/{{itemId}} HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+{
+    "name": "Updated Item",
+    "description": "Updated via PUT",
+    "price": 39.99
+}
+
+### Partial Update
+PATCH {{baseUrl}}/api/items/{{itemId}} HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+{
+    "price": 44.99
+}
+
+### Head Request
+HEAD {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+### Options Request
+OPTIONS {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+Access-Control-Request-Method: GET, POST, PUT, DELETE, PATCH
+Access-Control-Request-Headers: Content-Type, Authorization
+
+### Trace Request
+TRACE {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+Max-Forwards: 10
+
+### Connect Request
+CONNECT {{host}}
+Host: {{host}}
+Authorization: Bearer {{token}}
+
+### Create Complex Item
+POST {{baseUrl}}/api/items HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+{
+    "name": "Complex Item",
+    "description": "Using processed data",
+    "price": "29.99",
+    "metadata": {
+        "allowed_methods": "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT",
+        "created_by": "{{userId}}"
+    }
+}
+
+### Delete Item
+DELETE {{baseUrl}}/api/items/{{itemId}} HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+### Verify Deletion
+GET {{baseUrl}}/api/items/{{itemId}} HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
+
+### Debug Variables
+GET {{baseUrl}}/debug/vars HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+Host: {{host}}
+Connection: keep-alive
