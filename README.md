@@ -100,7 +100,7 @@ See `requirements-dev.txt` and `requirements-test.txt` for the complete list of 
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](docs/CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## License
 
