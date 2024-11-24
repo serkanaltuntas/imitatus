@@ -1,0 +1,10 @@
+[project]
+name = "imitatus"
+dynamic = ["version"]
+authors = [
+    {name = "Serkan Altuntas", email = "serkan@serkan.ai"},
+]
+description = "A zero-dependency, sophisticated mock HTTP server for development and testing"
+readme = "README.md"
+requires-python = ">=3.8"
+# No dependencies section needed - project has no production dependencies

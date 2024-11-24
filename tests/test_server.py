@@ -4,7 +4,7 @@ import json
 import threading
 import time
 from http.server import HTTPServer
-from src.server import MockHTTPRequestHandler
+from imitatus.server import MockHTTPRequestHandler
 
 
 class TestImitatus:

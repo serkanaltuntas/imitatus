@@ -1,0 +1,50 @@
+# Include license and readme
+include LICENSE
+include README.md
+
+# Include all requirements files
+include requirements.txt
+include requirements-dev.txt
+include requirements-test.txt
+
+# Include build and configuration files
+include pyproject.toml
+include setup.py
+include Makefile
+
+# Include examples
+graft examples
+
+# Include test files
+graft tests
+
+# Include docs (if you have them)
+graft docs
+
+# Include source files
+graft src
+
+# Exclude temporary files and directories
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude *.egg-info
+global-exclude *.egg
+global-exclude .env*
+global-exclude .coverage
+global-exclude .pytest_cache
+global-exclude .git*
+global-exclude .venv*
+
+# Exclude development and test cache directories
+prune tests/__pycache__
+prune tests/.pytest_cache
+prune src/__pycache__
+prune .pytest_cache
+prune .coverage
+prune htmlcov
+prune .venv
+prune venv
+prune build
+prune dist

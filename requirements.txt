@@ -1,0 +1,13 @@
+# File: requirements.txt
+# This project intentionally has no production dependencies
+# It uses only Python standard library components for core functionality
+#
+# Development dependencies are in requirements-dev.txt
+# Testing dependencies are in requirements-test.txt
+#
+# This empty requirements file is provided for clarity and documentation purposes.
+# The project is designed to run with zero external dependencies for its core functionality.
+
+# Note: If you're looking to develop or test Imitatus, please see:
+# - requirements-dev.txt  : For development tools (black, flake8, etc.)
+# - requirements-test.txt : For testing requirements (pytest, etc.)

@@ -47,7 +47,7 @@ setup(
         "Natural Language :: English",
     ],
     python_requires=">=3.8",
-    install_requires=[],
+    install_requires=[],  # Explicitly empty - no production dependencies
     extras_require={
         "dev": [
             "pytest>=7.0.0",
@@ -77,5 +77,7 @@ setup(
         "development",
         "api",
         "rest",
+        "zero-dependency",
+        "lightweight",
     ],
 )

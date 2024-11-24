@@ -70,23 +70,33 @@ curl http://localhost:8000/api/items \
 - `GET /debug/vars`: System state and metrics
 - `OPTIONS /api/items`: Available methods and API info
 
-## Development
+## Dependencies
 
 ### Prerequisites
 - Python 3.8+
 - pip
 
-### Development Setup
+### Production
+Imitatus is designed to have **zero production dependencies**. It uses only Python's standard library components for all core functionality. This design choice provides several benefits:
+
+- 🔒 Enhanced security with no third-party dependency risks
+- ⚡ Fast and lightweight installation
+- 🎯 No version conflicts with other packages
+- 📦 Maximum portability across Python environments
+
+### Development
+For development and testing, we use several high-quality tools:
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install development dependencies
 pip install -r requirements-dev.txt
+
+# Install testing dependencies
+pip install -r requirements-test.txt
 ```
 
-### Running Tests
-```bash
-python -m pytest tests/
-```
+See `requirements-dev.txt` and `requirements-test.txt` for the complete list of development and testing dependencies.
+
 
 ## Contributing
 
@@ -98,12 +108,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-Created by [Serkan Altuntas](https://serkan.ai)
+Built with precision by [Serkan Altuntas](https://serkan.ai)
 
 ## Support
 
 - Submit issues via GitHub
 - Review documentation
-
----
-Built with precision by Serkan Altuntas

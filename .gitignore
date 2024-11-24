@@ -1,3 +1,6 @@
+# PyPI credentials
+.pypirc
+
 # Virtual Environment
 .venv/
 venv/
