@@ -19,7 +19,7 @@ Example:
 """
 
 __title__ = "imitatus"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Serkan Altuntas"
 __email__ = "serkan@serkan.ai"
 __license__ = "MIT"
