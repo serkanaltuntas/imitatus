@@ -1,0 +1,4 @@
+# Minimal testing requirements for HTTP server
+pytest>=7.0.0
+requests>=2.31.0
+pytest-cov>=4.1.0
